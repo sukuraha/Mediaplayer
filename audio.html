@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html ng-app="MediaPlayerApp">
+<head>
+    <title>AngularJS Media Player</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body ng-controller="MediaPlayerController as player">
+    <h1>Audio Player</h1>
+    <div class="search">
+    <center>
+        <input type="text" ng-model="player.searchQuery" placeholder="Search">
+        <button ng-click="player.search()">Search</button>
+    </center>
+</div>
+    
+    <center>
+        <select ng-model="player.sortBy">
+            <option value="title">Title</option>
+            <option value="artist">Artist</option>
+        </select>
+    </center>
+
+ 
+    
+    <div class="song-container">
+        <div ng-repeat="song in player.filteredSongs | orderBy: player.sortBy" class="song-item">
+            <div class="song-info">
+                <center><img src="{{song.imageSrc}}" alt="{{song.title}}" class="song-image" width="300" height="200">
+                <p style="font-size: 20px;font-style: italic;">{{ song.title }} by {{ song.artist }}</p></center>
+            </div>
+           <center><audio ng-src="{{song.audioSrc}}" controls id="{{song.title}}"></audio>
+        </center> 
+             
+            <div class="play-button">
+                <button ng-click="player.play(song)">{{ player.isPlaying(song) ? 'Pause' : 'Play' }}</button>
+            </div>
+
+            <div class="like-button" ng-click="player.toggleLike(song)">
+                <span ng-class="{'liked': song.liked}">&#9733;</span>
+            </div>
+           
+            <!-- Add an <audio> element for each song -->
+           
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<script>
+    angular.module('MediaPlayerApp', [])
+    .controller('MediaPlayerController', function($http) {
+        var vm = this;
+
+        vm.songs = [
+    {
+        title: 'Nenjame Nenjame Song',
+        artist: 'A.R. Rahman',
+        liked: false,
+        
+        audioSrc: 'song1.mp3',
+        imageSrc: 'song1.jpeg' // Add the image URL for song1
+    },
+    {
+        title: 'Vaa Vaathi',
+        artist: 'G.V. Prakash Kumar',
+        liked: false,
+        
+        audioSrc: 'song2.mp3',
+        imageSrc: 'song2.jpeg' // Add the image URL for song2
+    },
+    {
+        title: 'Anbenum ',
+        artist: 'Anirudh Ravichander',
+        liked: false,
+        
+        audioSrc: 'song3.mp3',
+        imageSrc: 'song3.jpg' // Add the image URL for song3
+    },
+    {
+        title: 'Naa Ready',
+        artist: 'Anirudh Ravichander',
+        liked: false,
+        
+        audioSrc: 'song4.mp3',
+        imageSrc: 'song4.jpeg' // Add the image URL for song4
+    },
+    {
+        title: ' Pathala Pathala',
+        artist: 'Anirudh Ravichander',
+        liked: false,
+        
+        audioSrc: 'song5.mp3',
+        imageSrc: 'song5.jpeg' // Add the image URL for song5
+    },
+    {
+        title: 'Porkanda Singam',
+        artist: 'Anirudh Ravichander',
+        liked: false,
+        
+        audioSrc: 'song6.mp3',
+        imageSrc: 'song6.jpeg' // Add the image URL for song6
+    },
+    // Add four more songs below
+    {
+        title: 'Night Is Dark',
+        artist: 'Sam',
+        liked: false,
+        
+        audioSrc: 'song7.mp3',
+        imageSrc: 'song7.jpg' // Add the image URL for song7
+    },
+    {
+        title: 'Vaa Senthaazhini',
+        artist: 'Sid Sriram',
+        liked: false,
+        
+        audioSrc: 'song8.mp3',
+        imageSrc: 'song8.jpeg' // Add the image URL for song8
+    },
+    {
+        title: 'Mudhal Kadhal',
+        artist: 'Justin Prabhakaran',
+        liked: false,
+        
+        audioSrc: 'song9.mp3',
+        imageSrc: 'song9.jpeg' // Add the image URL for song9
+    }
+   
+];
+
+
+
+        vm.searchQuery = '';
+        vm.sortBy = 'title';
+
+        vm.filteredSongs = vm.songs;
+        
+
+        // Add a property to track the currently playing song
+        vm.currentSong = null;
+
+        vm.search = function() {
+            vm.filteredSongs = vm.songs.filter(function(song) {
+                return song.title.toLowerCase().includes(vm.searchQuery.toLowerCase()) || song.artist.toLowerCase().includes(vm.searchQuery.toLowerCase());
+            });
+        };
+        vm.clearSearch = function() {
+            if (!vm.searchQuery) {
+                // If the search query is empty, reset it
+                vm.searchQuery = '';
+                vm.filteredSongs = vm.songs; // Reset the filtered songs to show all songs
+            }
+        };
+        // Update the toggleLike function in your AngularJS controller
+        vm.toggleLike = function(song) {
+  song.liked = !song.liked;
+  
+  $http.post('/api/like-song', { title: song.title, liked: song.liked })
+    .then(function(response) {
+      // Handle success
+      console.log(response.data.message);
+    })
+    .catch(function(error) {
+      // Handle error
+      console.error(error.data.error);
+    });
+};
+
+
+
+
+        vm.play = function(song) {
+            var audioElement = document.getElementById(song.title);
+            
+            if (vm.currentSong !== song) {
+                // Pause the currently playing song
+                if (vm.currentSong) {
+                    var currentAudioElement = document.getElementById(vm.currentSong.title);
+                    currentAudioElement.pause();
+                }
+
+                // Play the selected song
+                audioElement.play();
+                vm.currentSong = song;
+            } else {
+                // Pause the currently playing song
+                audioElement.pause();
+                vm.currentSong = null;
+            }
+        };
+        
+
+        // Function to check if a song is currently playing
+        vm.isPlaying = function(song) {
+            return vm.currentSong === song;
+        };
+    });
+    
+    
+</script>
+</html>

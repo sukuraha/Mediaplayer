@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Media Player Start Page</title>
+    <style>
+        /* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Prevents scrollbars */
+}
+
+/* Background image styling */
+.background {
+    background-image: url('image.png');
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+/* Content container */
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+}
+
+h1 {
+    font-size: 50px;
+    font-style: italic;
+    margin-bottom: 20px;
+    color:red;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 30px;
+    font-style: italic;
+    color:red;
+}
+
+/* Button styling */
+button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+/* Keyframes for pop-in animation */
+@keyframes pop-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+h1, h2 {
+    animation: pop-in 4s ease-out infinite;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="content">
+            <h1>Welcome to Alpha MediaPlayer </h1>
+            <h2>Press Play to Begin</h2>
+            <button id="playButton" >Play</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Add an event listener to the button to navigate to the next page
+    const playButton = document.getElementById('playButton');
+    playButton.addEventListener('click', function() {
+        // Replace 'next-page.html' with the actual URL of the next page
+        window.location.href = 'main.html';
+    });
+});
+
+    </script>
+</body>
+</html>

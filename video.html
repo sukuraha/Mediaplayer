@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html ng-app="MediaPlayerApp">
+<head>
+    <title>AngularJS Media Player</title>
+    <link rel="stylesheet" type="text/css" href="style1.css">
+</head>
+<body ng-controller="MediaPlayerController as player">
+    <h1>Video Player</h1>
+    <div class="search">
+    <center>
+        <input type="text" ng-model="player.searchQuery" placeholder="Search">
+        <button ng-click="player.search()">Search</button>
+    </center>
+    </div>
+
+    <center>
+        <select ng-model="player.sortBy">
+            <option value="title">Title</option>
+            <option value="artist">Artist</option>
+        </select>
+    </center>
+
+   
+    <br>
+    <div class="song-container">
+        <div ng-repeat="media in player.filteredMedia | orderBy: player.sortBy" class="song-item">
+            <center>
+                <p style="font-size: 20px; font-style: italic;">{{ media.title }} by {{ media.artist }}</p>
+            </center>
+            <br>
+            <div class="song-info">
+                <video ng-src="{{ media.source }}" controls title="{{ media.title }}"  width="300" height="250"></video>
+            </div>
+            <center>
+                <!-- Use ng-if to conditionally display "Play" or "Pause" button -->
+                <button style="background: #f60303; color: rgb(243, 239, 239);" ng-click="player.togglePlayPause(media)">
+                    {{ media.isPlaying ? 'Pause' : 'Play' }}
+                </button>
+                <!-- Add a like button to each video -->
+<div class="like-button" ng-click="player.toggleLike(media)">
+    <span ng-class="{'liked': media.liked}" ng-bind="media.likes + ' ' + '&#9733;'"></span>
+</div>
+
+            </center>
+        </div>
+    </div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<script>
+    angular.module('MediaPlayerApp', [])
+        .controller('MediaPlayerController', function() {
+            var vm = this;
+
+            vm.media = [
+                { title: 'Naan Gaali', artist: 'Sean Roldan', source: 'video1.mp4', liked: false, isPlaying: false },
+                { title: 'Nira Nira', artist: ' Malvi Sundaresan', source: 'video2.mp4', liked: false, isPlaying: false },
+                { title: 'Tum Tum', artist: ' S. Thaman', source: 'video3.mp4', liked: false, isPlaying: false },
+                { title: 'En Kannu Kulla ', artist: 'Vishal C ', source: 'video4.mp4', liked: false, isPlaying: false },
+                { title: 'Idhazhin Oram', artist: 'Anirudh Ravichander', source: 'video5.mp4', liked: false, isPlaying: false },
+                { title: 'Un Vizhigalil', artist: 'G.V. Prakash Kumar', source: 'video6.mp4', liked: false, isPlaying: false },
+            ];
+
+            vm.searchQuery = '';
+            vm.sortBy = 'title';
+            vm.filteredMedia = vm.media;
+
+            vm.toggleLike = function (media) {
+            // Toggle the liked status for the video
+            media.liked = !media.liked;
+
+            // Send a POST request to your Node.js server to update the like status in the database
+            $http.post('/api/like-video', { title: media.title, liked: media.liked })
+                .then(function (response) {
+                    // Update the likes count in the UI based on the response from the server
+                    media.likes = response.data.likes;
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    // Handle errors if needed
+                });
+        };
+           
+
+            vm.search = function() {
+                vm.filteredMedia = vm.media.filter(function(media) {
+                    return media.title.toLowerCase().includes(vm.searchQuery.toLowerCase()) || media.artist.toLowerCase().includes(vm.searchQuery.toLowerCase());
+                });
+            };
+
+           
+
+            vm.togglePlayPause = function(media) {
+                // Get the video element by its title
+                var videoElement = document.querySelector('video[title="' + media.title + '"]');
+
+                if (videoElement) {
+                    if (videoElement.paused) {
+                        videoElement.play();
+                        media.isPlaying = true;
+                    } else {
+                        videoElement.pause();
+                        media.isPlaying = false;
+                    }
+                }
+            };
+        });
+</script>
+</html>
